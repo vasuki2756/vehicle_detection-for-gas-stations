@@ -10,6 +10,7 @@ const VideoFeed = ({ selectedVehicleId, onVehicleHover }) => {
   const [hoveredVehicle, setHoveredVehicle] = useState(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Update timestamp every second for CCTV effect
   useEffect(() => {
@@ -18,6 +19,22 @@ const VideoFeed = ({ selectedVehicleId, onVehicleHover }) => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Handle double-click to toggle fullscreen
+  const handleVideoDoubleClick = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+
+  // Handle Escape key to exit fullscreen
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isFullscreen]);
 
   // Draw vehicle masks and overlays - runs on every vehicle data update
   useEffect(() => {
@@ -181,7 +198,13 @@ const VideoFeed = ({ selectedVehicleId, onVehicleHover }) => {
           Live
         </div>
       </div>
-      <div className="video-container">
+      <div className={`video-container ${isFullscreen ? 'fullscreen' : ''}`} onDoubleClick={handleVideoDoubleClick}>
+        {/* Close button for fullscreen */}
+        {isFullscreen && (
+          <button className="fullscreen-close" onClick={() => setIsFullscreen(false)}>
+            ✕
+          </button>
+        )}
         {/* CCTV-style timestamp overlay */}
         <div className="cctv-overlay">
           CAM 01 | {currentTime.toLocaleDateString('en-US', { 
@@ -212,7 +235,7 @@ const VideoFeed = ({ selectedVehicleId, onVehicleHover }) => {
             }
           }}
         >
-          <source src="/sample-video.mp4" type="video/mp4" />
+          <source src="http://localhost:8000/data/car.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         <canvas
@@ -250,25 +273,25 @@ const VideoFeed = ({ selectedVehicleId, onVehicleHover }) => {
             </div>
           </div>
         )}
+      </div>
 
-        {/* Legend */}
-        <div className="legend">
-          <div className="legend-item">
-            <span className="legend-color" style={{ backgroundColor: '#ef4444' }}></span>
-            Hazardous (Delayed)
-          </div>
-          <div className="legend-item">
-            <span className="legend-color" style={{ backgroundColor: '#eab308' }}></span>
-            Unauthorized
-          </div>
-          <div className="legend-item">
-            <span className="legend-color" style={{ backgroundColor: '#22c55e' }}></span>
-            Worker/Authorized
-          </div>
-          <div className="legend-item">
-            <span className="legend-color" style={{ backgroundColor: '#f97316' }}></span>
-            Hazardous (Normal)
-          </div>
+      {/* Legend */}
+      <div className="legend">
+        <div className="legend-item">
+          <span className="legend-color" style={{ backgroundColor: '#ef4444' }}></span>
+          Hazardous (Delayed)
+        </div>
+        <div className="legend-item">
+          <span className="legend-color" style={{ backgroundColor: '#eab308' }}></span>
+          Unauthorized
+        </div>
+        <div className="legend-item">
+          <span className="legend-color" style={{ backgroundColor: '#22c55e' }}></span>
+          Worker/Authorized
+        </div>
+        <div className="legend-item">
+          <span className="legend-color" style={{ backgroundColor: '#f97316' }}></span>
+          Hazardous (Normal)
         </div>
       </div>
     </div>

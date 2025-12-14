@@ -1,0 +1,33 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# OS/editor
+.DS_Store
+Thumbs.db
+
+# ML/vision runtime outputs
+runs/
+test_output/
+
+# Local virtual envs (if created inside backend)
+.venv/
+venv/
+"*.mp4" 
